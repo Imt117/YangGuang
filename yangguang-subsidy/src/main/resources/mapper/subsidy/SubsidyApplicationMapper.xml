@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yangguang.subsidy.mapper.SubsidyApplicationMapper">
+
+    <resultMap type="SubsidyApplication" id="SubsidyApplicationResult">
+        <result property="applicationId"    column="application_id"    />
+        <result property="applicantUserId"    column="applicant_user_id"    />
+        <result property="projectId"    column="project_id"    />
+        <result property="applicationStatus"    column="application_status"    />
+        <result property="applicantName"    column="applicant_name"    />
+        <result property="applicantIdNo"    column="applicant_id_no"    />
+        <result property="applicantGender"    column="applicant_gender"    />
+        <result property="applicantType"    column="applicant_type"    />
+        <result property="uploadedFiles"    column="uploaded_files"    />
+        <result property="applicationDate"    column="application_date"    />
+    </resultMap>
+
+    <sql id="selectSubsidyApplicationVo">
+        select application_id, applicant_user_id, project_id, application_status, applicant_name, applicant_id_no, applicant_gender, applicant_type, uploaded_files, application_date from subsidy_application
+    </sql>
+
+    <select id="selectSubsidyApplicationList" parameterType="SubsidyApplication" resultMap="SubsidyApplicationResult">
+        <include refid="selectSubsidyApplicationVo"/>
+        <where>
+            <if test="applicantUserId != null "> and applicant_user_id = #{applicantUserId}</if>
+            <if test="projectId != null "> and project_id = #{projectId}</if>
+            <if test="applicationStatus != null  and applicationStatus != ''"> and application_status = #{applicationStatus}</if>
+            <if test="applicantName != null  and applicantName != ''"> and applicant_name like concat('%', #{applicantName}, '%')</if>
+            <if test="applicantIdNo != null  and applicantIdNo != ''"> and applicant_id_no = #{applicantIdNo}</if>
+            <if test="applicantGender != null  and applicantGender != ''"> and applicant_gender = #{applicantGender}</if>
+            <if test="applicantType != null  and applicantType != ''"> and applicant_type = #{applicantType}</if>
+            <if test="uploadedFiles != null  and uploadedFiles != ''"> and uploaded_files = #{uploadedFiles}</if>
+            <if test="applicationDate != null "> and application_date = #{applicationDate}</if>
+        </where>
+    </select>
+
+    <select id="selectSubsidyApplicationByApplicationId" parameterType="Long" resultMap="SubsidyApplicationResult">
+        <include refid="selectSubsidyApplicationVo"/>
+        where application_id = #{applicationId}
+    </select>
+
+    <insert id="insertSubsidyApplication" parameterType="SubsidyApplication" useGeneratedKeys="true" keyProperty="applicationId">
+        insert into subsidy_application
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="applicantUserId != null">applicant_user_id,</if>
+            <if test="projectId != null">project_id,</if>
+            <if test="applicationStatus != null and applicationStatus != ''">application_status,</if>
+            <if test="applicantName != null and applicantName != ''">applicant_name,</if>
+            <if test="applicantIdNo != null and applicantIdNo != ''">applicant_id_no,</if>
+            <if test="applicantGender != null and applicantGender != ''">applicant_gender,</if>
+            <if test="applicantType != null and applicantType != ''">applicant_type,</if>
+            <if test="uploadedFiles != null">uploaded_files,</if>
+            <if test="applicationDate != null">application_date,</if>
+            <!-- 默认值设置为 '待审批' -->
+            application_status
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="applicantUserId != null">#{applicantUserId},</if>
+            <if test="projectId != null">#{projectId},</if>
+            <if test="applicationStatus != null and applicationStatus != ''">#{applicationStatus},</if>
+            <if test="applicantName != null and applicantName != ''">#{applicantName},</if>
+            <if test="applicantIdNo != null and applicantIdNo != ''">#{applicantIdNo},</if>
+            <if test="applicantGender != null and applicantGender != ''">#{applicantGender},</if>
+            <if test="applicantType != null and applicantType != ''">#{applicantType},</if>
+            <if test="uploadedFiles != null">#{uploadedFiles},</if>
+            <if test="applicationDate != null">#{applicationDate},</if>
+            '待审批'
+        </trim>
+    </insert>
+
+    <update id="updateSubsidyApplication" parameterType="SubsidyApplication">
+        update subsidy_application
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="applicantUserId != null">applicant_user_id = #{applicantUserId},</if>
+            <if test="projectId != null">project_id = #{projectId},</if>
+            <if test="applicationStatus != null and applicationStatus != ''">application_status = #{applicationStatus},</if>
+            <if test="applicantName != null and applicantName != ''">applicant_name = #{applicantName},</if>
+            <if test="applicantIdNo != null and applicantIdNo != ''">applicant_id_no = #{applicantIdNo},</if>
+            <if test="applicantGender != null and applicantGender != ''">applicant_gender = #{applicantGender},</if>
+            <if test="applicantType != null and applicantType != ''">applicant_type = #{applicantType},</if>
+            <if test="uploadedFiles != null">uploaded_files = #{uploadedFiles},</if>
+            <if test="applicationDate != null">application_date = #{applicationDate},</if>
+        </trim>
+        where application_id = #{applicationId}
+    </update>
+
+    <delete id="deleteSubsidyApplicationByApplicationId" parameterType="Long">
+        delete from subsidy_application where application_id = #{applicationId}
+    </delete>
+
+    <delete id="deleteSubsidyApplicationByApplicationIds" parameterType="String">
+        delete from subsidy_application where application_id in
+        <foreach item="applicationId" collection="array" open="(" separator="," close=")">
+            #{applicationId}
+        </foreach>
+    </delete>
+</mapper>

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yangguang.subsidy.mapper.SubsidyProjectProcessMapper">
+    
+    <resultMap type="SubsidyProjectProcess" id="SubsidyProjectProcessResult">
+        <result property="processId"    column="process_id"    />
+        <result property="projectId"    column="project_id"    />
+        <result property="stepName"    column="step_name"    />
+        <result property="stepOrder"    column="step_order"    />
+    </resultMap>
+
+    <sql id="selectSubsidyProjectProcessVo">
+        select process_id, project_id, step_name, step_order from subsidy_project_process
+    </sql>
+
+    <select id="selectSubsidyProjectProcessList" parameterType="SubsidyProjectProcess" resultMap="SubsidyProjectProcessResult">
+        <include refid="selectSubsidyProjectProcessVo"/>
+        <where>  
+            <if test="projectId != null "> and project_id = #{projectId}</if>
+            <if test="stepName != null  and stepName != ''"> and step_name like concat('%', #{stepName}, '%')</if>
+            <if test="stepOrder != null "> and step_order = #{stepOrder}</if>
+        </where>
+    </select>
+    
+    <select id="selectSubsidyProjectProcessByProcessId" parameterType="Long" resultMap="SubsidyProjectProcessResult">
+        <include refid="selectSubsidyProjectProcessVo"/>
+        where process_id = #{processId}
+    </select>
+        
+    <insert id="insertSubsidyProjectProcess" parameterType="SubsidyProjectProcess" useGeneratedKeys="true" keyProperty="processId">
+        insert into subsidy_project_process
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="projectId != null">project_id,</if>
+            <if test="stepName != null and stepName != ''">step_name,</if>
+            <if test="stepOrder != null">step_order,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="projectId != null">#{projectId},</if>
+            <if test="stepName != null and stepName != ''">#{stepName},</if>
+            <if test="stepOrder != null">#{stepOrder},</if>
+         </trim>
+    </insert>
+
+    <update id="updateSubsidyProjectProcess" parameterType="SubsidyProjectProcess">
+        update subsidy_project_process
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="projectId != null">project_id = #{projectId},</if>
+            <if test="stepName != null and stepName != ''">step_name = #{stepName},</if>
+            <if test="stepOrder != null">step_order = #{stepOrder},</if>
+        </trim>
+        where process_id = #{processId}
+    </update>
+
+    <delete id="deleteSubsidyProjectProcessByProcessId" parameterType="Long">
+        delete from subsidy_project_process where process_id = #{processId}
+    </delete>
+
+    <delete id="deleteSubsidyProjectProcessByProcessIds" parameterType="String">
+        delete from subsidy_project_process where process_id in 
+        <foreach item="processId" collection="array" open="(" separator="," close=")">
+            #{processId}
+        </foreach>
+    </delete>
+</mapper>

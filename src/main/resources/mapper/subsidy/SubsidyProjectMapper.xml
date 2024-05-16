@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yangguang.subsidy.mapper.SubsidyProjectMapper">
+    
+    <resultMap type="SubsidyProject" id="SubsidyProjectResult">
+        <result property="projectId"    column="project_id"    />
+        <result property="projectName"    column="project_name"    />
+        <result property="description"    column="description"    />
+    </resultMap>
+
+    <sql id="selectSubsidyProjectVo">
+        select project_id, project_name, description from subsidy_project
+    </sql>
+
+    <select id="selectSubsidyProjectList" parameterType="SubsidyProject" resultMap="SubsidyProjectResult">
+        <include refid="selectSubsidyProjectVo"/>
+        <where>  
+            <if test="projectName != null  and projectName != ''"> and project_name like concat('%', #{projectName}, '%')</if>
+            <if test="description != null  and description != ''"> and description = #{description}</if>
+        </where>
+    </select>
+    
+    <select id="selectSubsidyProjectByProjectId" parameterType="Long" resultMap="SubsidyProjectResult">
+        <include refid="selectSubsidyProjectVo"/>
+        where project_id = #{projectId}
+    </select>
+        
+    <insert id="insertSubsidyProject" parameterType="SubsidyProject" useGeneratedKeys="true" keyProperty="projectId">
+        insert into subsidy_project
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="projectName != null and projectName != ''">project_name,</if>
+            <if test="description != null">description,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="projectName != null and projectName != ''">#{projectName},</if>
+            <if test="description != null">#{description},</if>
+         </trim>
+    </insert>
+
+    <update id="updateSubsidyProject" parameterType="SubsidyProject">
+        update subsidy_project
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="projectName != null and projectName != ''">project_name = #{projectName},</if>
+            <if test="description != null">description = #{description},</if>
+        </trim>
+        where project_id = #{projectId}
+    </update>
+
+    <delete id="deleteSubsidyProjectByProjectId" parameterType="Long">
+        delete from subsidy_project where project_id = #{projectId}
+    </delete>
+
+    <delete id="deleteSubsidyProjectByProjectIds" parameterType="String">
+        delete from subsidy_project where project_id in 
+        <foreach item="projectId" collection="array" open="(" separator="," close=")">
+            #{projectId}
+        </foreach>
+    </delete>
+</mapper>

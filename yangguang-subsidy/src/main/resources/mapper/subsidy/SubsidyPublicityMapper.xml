@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yangguang.subsidy.mapper.SubsidyPublicityMapper">
+    
+    <resultMap type="SubsidyPublicity" id="SubsidyPublicityResult">
+        <result property="publicityId"    column="publicity_id"    />
+        <result property="projectId"    column="project_id"    />
+        <result property="startTime"    column="start_time"    />
+        <result property="endTime"    column="end_time"    />
+        <result property="uploadedFiles"    column="uploaded_files"    />
+    </resultMap>
+
+    <sql id="selectSubsidyPublicityVo">
+        select publicity_id, project_id, start_time, end_time, uploaded_files from subsidy_publicity
+    </sql>
+
+    <select id="selectSubsidyPublicityList" parameterType="SubsidyPublicity" resultMap="SubsidyPublicityResult">
+        <include refid="selectSubsidyPublicityVo"/>
+        <where>  
+            <if test="projectId != null "> and project_id = #{projectId}</if>
+            <if test="startTime != null "> and start_time = #{startTime}</if>
+            <if test="endTime != null "> and end_time = #{endTime}</if>
+            <if test="uploadedFiles != null  and uploadedFiles != ''"> and uploaded_files = #{uploadedFiles}</if>
+        </where>
+    </select>
+    
+    <select id="selectSubsidyPublicityByPublicityId" parameterType="Long" resultMap="SubsidyPublicityResult">
+        <include refid="selectSubsidyPublicityVo"/>
+        where publicity_id = #{publicityId}
+    </select>
+        
+    <insert id="insertSubsidyPublicity" parameterType="SubsidyPublicity" useGeneratedKeys="true" keyProperty="publicityId">
+        insert into subsidy_publicity
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="projectId != null">project_id,</if>
+            <if test="startTime != null">start_time,</if>
+            <if test="endTime != null">end_time,</if>
+            <if test="uploadedFiles != null">uploaded_files,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="projectId != null">#{projectId},</if>
+            <if test="startTime != null">#{startTime},</if>
+            <if test="endTime != null">#{endTime},</if>
+            <if test="uploadedFiles != null">#{uploadedFiles},</if>
+         </trim>
+    </insert>
+
+    <update id="updateSubsidyPublicity" parameterType="SubsidyPublicity">
+        update subsidy_publicity
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="projectId != null">project_id = #{projectId},</if>
+            <if test="startTime != null">start_time = #{startTime},</if>
+            <if test="endTime != null">end_time = #{endTime},</if>
+            <if test="uploadedFiles != null">uploaded_files = #{uploadedFiles},</if>
+        </trim>
+        where publicity_id = #{publicityId}
+    </update>
+
+    <delete id="deleteSubsidyPublicityByPublicityId" parameterType="Long">
+        delete from subsidy_publicity where publicity_id = #{publicityId}
+    </delete>
+
+    <delete id="deleteSubsidyPublicityByPublicityIds" parameterType="String">
+        delete from subsidy_publicity where publicity_id in 
+        <foreach item="publicityId" collection="array" open="(" separator="," close=")">
+            #{publicityId}
+        </foreach>
+    </delete>
+</mapper>

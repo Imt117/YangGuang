@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yangguang.subsidy.mapper.SubsidyApprovalMapper">
+    
+    <resultMap type="SubsidyApproval" id="SubsidyApprovalResult">
+        <result property="approvalId"    column="approval_id"    />
+        <result property="applicationId"    column="application_id"    />
+        <result property="approverUserId"    column="approver_user_id"    />
+        <result property="approvalStatus"    column="approval_status"    />
+        <result property="approvalComments"    column="approval_comments"    />
+        <result property="approvalDate"    column="approval_date"    />
+    </resultMap>
+
+    <sql id="selectSubsidyApprovalVo">
+        select approval_id, application_id, approver_user_id, approval_status, approval_comments, approval_date from subsidy_approval
+    </sql>
+
+    <select id="selectSubsidyApprovalList" parameterType="SubsidyApproval" resultMap="SubsidyApprovalResult">
+        <include refid="selectSubsidyApprovalVo"/>
+        <where>  
+            <if test="applicationId != null "> and application_id = #{applicationId}</if>
+            <if test="approverUserId != null "> and approver_user_id = #{approverUserId}</if>
+            <if test="approvalStatus != null  and approvalStatus != ''"> and approval_status = #{approvalStatus}</if>
+            <if test="approvalComments != null  and approvalComments != ''"> and approval_comments = #{approvalComments}</if>
+            <if test="approvalDate != null "> and approval_date = #{approvalDate}</if>
+        </where>
+    </select>
+    
+    <select id="selectSubsidyApprovalByApprovalId" parameterType="Long" resultMap="SubsidyApprovalResult">
+        <include refid="selectSubsidyApprovalVo"/>
+        where approval_id = #{approvalId}
+    </select>
+        
+    <insert id="insertSubsidyApproval" parameterType="SubsidyApproval" useGeneratedKeys="true" keyProperty="approvalId">
+        insert into subsidy_approval
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="applicationId != null">application_id,</if>
+            <if test="approverUserId != null">approver_user_id,</if>
+            <if test="approvalStatus != null and approvalStatus != ''">approval_status,</if>
+            <if test="approvalComments != null">approval_comments,</if>
+            <if test="approvalDate != null">approval_date,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="applicationId != null">#{applicationId},</if>
+            <if test="approverUserId != null">#{approverUserId},</if>
+            <if test="approvalStatus != null and approvalStatus != ''">#{approvalStatus},</if>
+            <if test="approvalComments != null">#{approvalComments},</if>
+            <if test="approvalDate != null">#{approvalDate},</if>
+         </trim>
+    </insert>
+
+    <update id="updateSubsidyApproval" parameterType="SubsidyApproval">
+        update subsidy_approval
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="applicationId != null">application_id = #{applicationId},</if>
+            <if test="approverUserId != null">approver_user_id = #{approverUserId},</if>
+            <if test="approvalStatus != null and approvalStatus != ''">approval_status = #{approvalStatus},</if>
+            <if test="approvalComments != null">approval_comments = #{approvalComments},</if>
+            <if test="approvalDate != null">approval_date = #{approvalDate},</if>
+        </trim>
+        where approval_id = #{approvalId}
+    </update>
+
+    <delete id="deleteSubsidyApprovalByApprovalId" parameterType="Long">
+        delete from subsidy_approval where approval_id = #{approvalId}
+    </delete>
+
+    <delete id="deleteSubsidyApprovalByApprovalIds" parameterType="String">
+        delete from subsidy_approval where approval_id in 
+        <foreach item="approvalId" collection="array" open="(" separator="," close=")">
+            #{approvalId}
+        </foreach>
+    </delete>
+</mapper>
