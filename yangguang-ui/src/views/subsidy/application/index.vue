@@ -17,13 +17,12 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="补贴ID" prop="projectId">
-        <el-input
-          v-model="queryParams.projectId"
-          placeholder="请输入补贴id"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
+
+      <el-form-item label="补贴类型" prop="projectId">
+        <el-select v-model="queryParams.projectId" placeholder="请选择补贴" clearable :style="{width: '100%'}">
+          <el-option v-for="(item, index) in projectIdOptions" :key="index" :label="item.label"
+                     :value="item.value" :disabled="item.disabled"></el-option>
+        </el-select>
       </el-form-item>
       <el-form-item label="身份证号码" prop="applicantIdNo">
         <el-input
@@ -157,14 +156,17 @@
         <el-form-item label="申请人员ID" prop="applicantUserId">
           <el-input v-model="form.applicantUserId" placeholder="请输入申请人员ID" />
         </el-form-item>
-        <el-form-item label="申请项目ID" prop="projectId">
-          <el-input v-model="form.projectId" placeholder="请输入申请项目ID" />
+        <el-form-item label="补贴类型" prop="projectId">
+          <el-select v-model="form.projectId" placeholder="请选择补贴" clearable :style="{width: '100%'}">
+            <el-option v-for="(item, index) in projectIdOptions" :key="index" :label="item.label"
+                       :value="item.value" :disabled="item.disabled"></el-option>
+          </el-select>
         </el-form-item>
         <el-form-item label="申请人姓名" prop="applicantName">
           <el-input v-model="form.applicantName" placeholder="请输入申请人姓名" />
         </el-form-item>
         <el-form-item label="身份证号码" prop="applicantIdNo">
-          <el-input v-model="form.applicantIdNo" placeholder="请输入身份证号码" />
+          <el-input v-model="form.applicantIdNo" placeholder="请输入身份证号码" :maxlength="18"/>
         </el-form-item>
         <el-form-item label="性别" prop="applicantGender">
           <el-radio-group v-model="form.applicantGender">
@@ -174,6 +176,10 @@
               :label="dict.value"
             >{{dict.label}}</el-radio>
           </el-radio-group>
+          <el-form-item label="人员类别" prop="applicantType">
+            <el-cascader v-model="form.applicantType" :options="applicantTypeOptions"
+                         :props="applicantTypeProps" :style="{width: '100%'}" placeholder="请选择人员类别" clearable></el-cascader>
+          </el-form-item>
         </el-form-item>
         <el-form-item label="上传材料" prop="uploadedFiles">
           <file-upload v-model="form.uploadedFiles"/>
@@ -203,6 +209,17 @@ export default {
   dicts: ['sys_user_sex'],
   data() {
     return {
+      //补贴ID与补贴名称转换
+      formData: {
+        projectId: '',
+      },
+      projectIdOptions: [{
+        "label": "耕地地力保护补贴",
+        "value": 1
+      }, {
+        "label": "义务教育补贴",
+        "value": 2
+      }],
       // 遮罩层
       loading: true,
       // 选中数组
@@ -243,7 +260,7 @@ export default {
           { required: true, message: "申请人员ID不能为空", trigger: "blur" }
         ],
         projectId: [
-          { required: true, message: "项目ID不能为空", trigger: "change" }
+          { required: true, message: "补贴项目不能为空", trigger: "change" }
         ],
         applicationStatus: [
           { required: true, message: "申请状态不能为空", trigger: "change" }
@@ -252,13 +269,14 @@ export default {
           { required: true, message: "申请人姓名不能为空", trigger: "blur" }
         ],
         applicantIdNo: [
-          { required: true, message: "身份证号码不能为空", trigger: "blur" }
+          { required: true, message: "身份证号码不能为空", trigger: "blur" },
+          {pattern: /^[1-9]\d{5}(18|19|20)\d{2}((0[1-9])|(1[0-2]))(([0-2][1-9])|10|20|30|31)\d{3}[0-9Xx]$/,message: '身份证格式错误',trigger: 'blur'}
         ],
         applicantGender: [
           { required: true, message: "性别不能为空", trigger: "change" }
         ],
         applicantType: [
-          { required: true, message: "人员类别不能为空", trigger: "change" }
+          { required: true, type: 'array',message: "人员类别不能为空", trigger: "change" }
         ],
         applicationDate: [
           { required: true, message: "申请日期不能为空", trigger: "blur" }
